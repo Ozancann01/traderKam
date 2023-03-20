@@ -1,5 +1,9 @@
 import pandas as pd
 import ta
+from sklearn.preprocessing import MinMaxScaler
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
 
 def load_data(filename):
     return pd.read_csv(f"data/{filename}")
@@ -41,6 +45,52 @@ def preprocess_data(filename):
     data = load_data(filename)
     data_with_indicators = calculate_technical_indicators(data)
     return data_with_indicators.dropna()
+
+
+def rate_of_change_and_difference(data, indicators=['SMA', 'EMA', 'RSI', 'MACD']):
+    for indicator in indicators:
+        data[f'{indicator}_ROC'] = data[indicator].pct_change()
+        data[f'{indicator}_Diff'] = data[indicator].diff()
+
+    return data
+
+
+
+def preprocess_data(symbol):
+    data = load_data(symbol)
+    data_with_indicators = calculate_technical_indicators(data)
+    data_with_moving_averages = moving_averages(data_with_indicators)
+    data_with_roc_and_diff = rate_of_change_and_difference(data_with_moving_averages)
+    scaled_data = scale_data(data_with_roc_and_diff)
+
+    return scaled_data
+
+
+
+def moving_averages(data, windows=[5, 10, 20]):
+    for window in windows:
+        data[f'SMA_{window}'] = data['SMA'].rolling(window=window).mean()
+        data[f'EMA_{window}'] = data['EMA'].ewm(span=window).mean()
+        data[f'RSI_{window}'] = data['RSI'].rolling(window=window).mean()
+        data[f'MACD_{window}'] = data['MACD'].rolling(window=window).mean()
+
+    return data
+
+def scale_data(data):
+    scaler = MinMaxScaler()
+
+    # List the columns you want to scale
+    columns_to_scale = [
+        'SMA', 'EMA', 'RSI', 'MACD',
+        'SMA_ROC', 'EMA_ROC', 'RSI_ROC', 'MACD_ROC',
+        'SMA_Diff', 'EMA_Diff', 'RSI_Diff', 'MACD_Diff'
+    ]
+
+    data[columns_to_scale] = scaler.fit_transform(data[columns_to_scale])
+
+    return data
+
+
 
 # Preprocess data for each cryptocurrency pair
 symbol_list = ['BTCUSDT_1d.csv', 'ETHUSDT_1d.csv', 'BNBUSDT_1d.csv', 'XRPUSDT_1d.csv']
