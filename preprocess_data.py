@@ -54,6 +54,8 @@ def rate_of_change_and_difference(data, indicators=['SMA', 'EMA', 'RSI', 'MACD']
 
     return data
 
+data = pd.read_csv("data/preprocessed_BTCUSDT_1d.csv")
+print(data.isna().sum())
 
 
 def preprocess_data(symbol):
@@ -61,6 +63,8 @@ def preprocess_data(symbol):
     data_with_indicators = calculate_technical_indicators(data)
     data_with_moving_averages = moving_averages(data_with_indicators)
     data_with_roc_and_diff = rate_of_change_and_difference(data_with_moving_averages)
+    data_with_roc_and_diff = data_with_roc_and_diff.dropna()
+
     scaled_data = scale_data(data_with_roc_and_diff)
 
     return scaled_data
@@ -86,9 +90,10 @@ def scale_data(data):
         'SMA_Diff', 'EMA_Diff', 'RSI_Diff', 'MACD_Diff'
     ]
 
-    data[columns_to_scale] = scaler.fit_transform(data[columns_to_scale])
+    scaled_data = data.copy()
+    scaled_data[columns_to_scale] = scaler.fit_transform(data[columns_to_scale])
 
-    return data
+    return scaled_data
 
 
 
