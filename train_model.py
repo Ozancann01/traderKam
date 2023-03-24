@@ -36,10 +36,6 @@ for symbol in symbol_list:
     models[model_name] = load_model(f"models/{model_name}_lstm.h5")
 
 
-
-
-
-
 def train_lstm_model(data, symbol, n_steps_in, n_steps_out, n_features, lstm_units, dropout_rate, epochs, batch_size):
     # The existing implementation of your train_lstm_model function
 
@@ -65,45 +61,6 @@ def train_lstm_model(data, symbol, n_steps_in, n_steps_out, n_features, lstm_uni
     model.save(f"models/{symbol}_lstm.h5")
 
     return model
-
-
-
-
-def trading_strategy(predictions, historical_data, window=14):
-    """
-    This function takes the predictions from the predict_direction function, historical data of the asset, and
-    a window for computing the moving average. It then creates a trading strategy based on the predicted
-    price direction and moving averages.
-
-    Args:
-    predictions (list): A list of predicted price directions.
-    historical_data (pd.DataFrame): A DataFrame containing historical data for the asset.
-    window (int): The window size for computing the moving average.
-
-    Returns:
-    pd.DataFrame: A DataFrame containing buy and sell signals.
-    """
-    # Calculate the moving average
-    historical_data['MovingAverage'] = historical_data['Close'].rolling(window=window).mean()
-
-    # Create a new DataFrame for the trading strategy
-    strategy = pd.DataFrame(index=historical_data.index)
-    strategy['Close'] = historical_data['Close']
-    strategy['MovingAverage'] = historical_data['MovingAverage']
-    strategy['Prediction'] = 0
-    strategy['Prediction'].iloc[window:] = predictions
-
-    # Generate buy and sell signals
-    strategy['Signal'] = 0
-    strategy.loc[strategy['Prediction'] == 1, 'Signal'] = 1
-    strategy.loc[strategy['Prediction'] == -1, 'Signal'] = -1
-
-    # Remove any rows that don't have a complete moving average
-    strategy.dropna(inplace=True)
-
-    return strategy
-
-
 
 
 # Make predictions for each cryptocurrency pair
