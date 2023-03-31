@@ -13,8 +13,8 @@ def save_to_csv(data, symbol, filename):
 
 # Initialize Binance exchange object
 exchange = ccxt.binance({
-    'apiKey': 'yl2oprSsxWnOUt5emls7AVIaYoGWRXWddtPk0WiNVns4SKvlI5nyyMtyjAwxCSs6',         # Replace with your Binance API key
-    'secret': 'KhiklzjukTeqcFSMKm1LMbLjVzIF77kuGaigyGaecPlkRqnabqC8HFognlqR6BvU',      # Replace with your Binance secret key
+    'apiKey': '',         # Replace with your Binance API key
+    'secret': '',      # Replace with your Binance secret key
     'enableRateLimit': True,
 })
 
